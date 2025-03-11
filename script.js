@@ -1,6 +1,6 @@
-const emojis = ['🍎', '🍌', '🍇', '🍉', '🍒', '🍍', '🥝', '🥑'];
+const emojis = ['😀', '😂', '😎', '🥳', '🤩', '😱', '😭', '😈'];
 let cards = [...emojis, ...emojis]; // Duplicate for pairs
-let flippedCards = [];
+let turnedCards = [];
 let matchedPairs = 0;
 let moves = 0;
 let timer = 0;
@@ -8,12 +8,17 @@ let interval;
 let playerName = "";
 let gameBoard = document.getElementById("gameBoard");
 
+function toggleStartButton() {
+    const playerName = document.getElementById("playerName").value.trim();
+    document.getElementById("startButton").disabled = playerName === "";
+}
+
 // Function to shuffle the cards
 function shuffle(array) {
     return array.sort(() => Math.random() - 0.5);
 }
 
-// Start the game (with player name input)
+// Start the game
 function startGame() {
     playerName = document.getElementById("playerName").value.trim();
     
@@ -22,28 +27,27 @@ function startGame() {
         return;
     }
 
-    cards = shuffle(cards);
-    gameBoard.innerHTML = ""; // Clear the board
+    cards = shuffle([...emojis, ...emojis]); // Ensures 16 cards
+    gameBoard.innerHTML = ""; // Clear previous board
 
-    // Create cards
     cards.forEach((emoji, index) => {
         let card = document.createElement("div");
         card.classList.add("card");
         card.dataset.index = index;
         card.dataset.emoji = emoji;
-        card.addEventListener("click", flipCard);
+        card.addEventListener("click", turnCard);
         gameBoard.appendChild(card);
     });
 
     // Reset game variables
-    flippedCards = [];
+    turnedCards = [];
     matchedPairs = 0;
     moves = 0;
     timer = 0;
     document.getElementById("moves").textContent = moves;
     document.getElementById("time").textContent = timer + "s";
 
-    // Stop previous timer if any
+    // Start Timer
     clearInterval(interval);
     interval = setInterval(() => {
         timer++;
@@ -52,29 +56,36 @@ function startGame() {
 }
 
 // Flip a card
-function flipCard() {
-    if (flippedCards.length < 2 && !this.classList.contains("flipped")) {
-        this.classList.add("flipped");
-        this.textContent = this.dataset.emoji;
-        flippedCards.push(this);
-    }
+function turnCard() {
+    if (turnedCards.length < 2 && !this.classList.contains("turned")) {
+        this.classList.add("turned");
 
-    if (flippedCards.length === 2) {
-        moves++;
-        document.getElementById("moves").textContent = moves;
-        setTimeout(checkMatch, 500);
+        // Ensure emoji is immediately visible
+        setTimeout(() => {
+            this.textContent = this.dataset.emoji;
+        }, 200); 
+
+        turnedCards.push(this);
+
+        if (turnedCards.length === 2) {
+            moves++;
+            document.getElementById("moves").textContent = moves;
+            setTimeout(checkMatch, 8);
+        }
     }
 }
 
-// Check if two flipped cards match
-function checkMatch() {
-    if (flippedCards.length !== 2) return;
 
-    const [card1, card2] = flippedCards;
+// Check if two turned cards match
+function checkMatch() {
+    if (turnedCards.length !== 2) return;
+
+    const [card1, card2] = turnedCards;
 
     if (card1.dataset.emoji === card2.dataset.emoji) {
+        // Matched pair: Keep emoji visible
         matchedPairs++;
-        flippedCards = [];
+        turnedCards = [];
 
         if (matchedPairs === emojis.length) {
             clearInterval(interval);
@@ -84,15 +95,20 @@ function checkMatch() {
             }, 500);
         }
     } else {
+        // Unmatched pair: Flip back
         setTimeout(() => {
-            card1.classList.remove("flipped");
-            card2.classList.remove("flipped");
-            card1.textContent = "";
-            card2.textContent = "";
-            flippedCards = [];
-        }, 500);
+            card1.classList.remove("turned");
+            card2.classList.remove("turned");
+
+            // Hide the emoji only after flipping back
+            card1.textContent = ""; 
+            card2.textContent = ""; 
+
+            turnedCards = [];
+        }, 1000); // Give time before flipping back
     }
 }
+
 
 // Save the score in local storage
 function saveScore(name, moves, time) {

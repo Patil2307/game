@@ -1,46 +1,80 @@
+/* General Styling */
 body {
     font-family: Arial, sans-serif;
     text-align: center;
     background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
 }
 
 h1 {
     color: #333;
 }
 
-.game-container {
-    display: grid;
-    grid-template-columns: repeat(4, 100px);
-    gap: 10px;
-    justify-content: center;
-    margin: 20px auto;
+/* Game Controls */
+.game-controls {
+    margin: 20px 0;
 }
 
-.card {
-    width: 100px;
-    height: 100px;
-    background-color: #333;
-    color: white;
-    font-size: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: transform 0.5s;
-}
-
-.card.flipped {
-    background-color: #fff;
-    color: black;
+input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 button {
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    transition: background 0.3s ease;
 }
-/* Leaderboard Styles */
+
+button:hover {
+    background-color: #218838;
+}
+
+/* Game Board */
+.game-container {
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    grid-template-rows: repeat(4, 100px);
+    gap: 10px;
+    justify-content: center;
+    margin: 20px auto;
+    max-width: 440px;
+}
+
+/* Cards */
+/* Ensure cards have a 3D flip effect */
+.card {
+    width: 100px;
+    height: 100px;
+    background-color: #333;
+    color: white;
+    font-size: 69px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.5s ease, background 0.3s ease-in-out;
+    transform-style: preserve-3d;
+    backface-visibility: visible;
+}
+
+/* Flip effect */
+.card.turned {
+    transform: rotateY(180deg);
+    background-color: #fff;
+    color: black;
+}
+
+/* Leaderboard */
 #leaderboard {
     width: 50%;
     margin: 20px auto;
@@ -60,4 +94,23 @@ button {
 
 #leaderboard tr:nth-child(even) {
     background-color: #f2f2f2;
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+    .game-container {
+        grid-template-columns: repeat(auto-fit, minmax(60px, 80px));
+        max-width: 100%;
+    }
+
+    .card {
+        width: 80px;
+        height: 80px;
+        font-size: 20px;
+    }
+
+    button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
 }
